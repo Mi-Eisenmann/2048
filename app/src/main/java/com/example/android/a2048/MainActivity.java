@@ -12,14 +12,17 @@ import android.view.View.OnTouchListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.Random;
+
 public class MainActivity extends AppCompatActivity {
 
     public static int[][] fieldMatrix = {
-            {1,1,0,0,0},
-            {0,0,0,0,0},
-            {0,0,0,0,0},
-            {0,0,0,0,0},
-            {0,0,0,0,0}
+            {1,0,0,0,0},
+            {0,1,0,0,0},
+            {0,0,1,0,0},
+            {0,0,0,1,0},
+            {0,0,0,0,1}
     };
 
     public static int touchX;
@@ -152,6 +155,10 @@ public class MainActivity extends AppCompatActivity {
                             fieldMatrix[i + 1][j] = fieldMatrix[i][j];
                             fieldMatrix[i][j] = 0;
                         }
+                        else {
+                            collision(i, j, i+1, j);
+                        }
+
                     }
                 }
             }
@@ -166,6 +173,10 @@ public class MainActivity extends AppCompatActivity {
                             fieldMatrix[i - 1][j] = fieldMatrix[i][j];
                             fieldMatrix[i][j] = 0;
                         }
+                        else {
+                            collision(i, j, i-1, j);
+                        }
+
                     }
                 }
             }
@@ -180,6 +191,10 @@ public class MainActivity extends AppCompatActivity {
                             fieldMatrix[i][j + 1] = fieldMatrix[i][j];
                             fieldMatrix[i][j] = 0;
                         }
+                        else {
+                            collision(i, j, i, j+1);
+                        }
+
                     }
                 }
             }
@@ -194,10 +209,17 @@ public class MainActivity extends AppCompatActivity {
                             fieldMatrix[i][j - 1] = fieldMatrix[i][j];
                             fieldMatrix[i][j] = 0;
                         }
+                        else {
+                            collision(i, j, i, j-1);
+                        }
+
                     }
                 }
             }
         }
+
+        // Spawn an additional "1" at the opposite side
+        add1();
 
 
         String result = String.valueOf(fieldMatrix[0][0]) + " " + String.valueOf(fieldMatrix[0][1]) + " " + String.valueOf(fieldMatrix[0][2]) + " " + String.valueOf(fieldMatrix[0][3]) + " " + String.valueOf(fieldMatrix[0][4]) + "\n"
@@ -207,6 +229,156 @@ public class MainActivity extends AppCompatActivity {
                 + String.valueOf(fieldMatrix[4][0]) + " " + String.valueOf(fieldMatrix[4][1]) + " " + String.valueOf(fieldMatrix[4][2]) + " " + String.valueOf(fieldMatrix[4][3]) + " " + String.valueOf(fieldMatrix[4][4]);
 
         Toast.makeText(getBaseContext(),result,Toast.LENGTH_SHORT).show();
+
+    }
+
+
+    // Process Collisions
+    public void collision(int i1, int j1, int i2, int j2){
+
+        // Read out the values in the colliding fields
+        int value1 = fieldMatrix[i1][j1];
+        int value2 = fieldMatrix[i2][j2];
+
+        // If they are identical, delete the moving element and double the receiving
+        if (value1 == value2){
+            fieldMatrix[i1][j1] = 0;
+            fieldMatrix[i2][j2] = 2 * value1;
+        }
+
+    }
+
+
+    // Add a "1"
+    public void add1(){
+
+        Random rand = new Random();
+
+        if (swipeDirection == "bottom"){
+
+            // Check for victory
+            victoryCheck();
+
+            // Find a position to put the "1"
+            boolean test = true;
+            while (test){
+                int randomNumber = rand.nextInt(4);
+                if(fieldMatrix[0][randomNumber] == 0){
+                    fieldMatrix[0][randomNumber] = 1;
+                    test = false;
+                }
+            }
+        } else if (swipeDirection == "top"){
+
+            // Check for victory
+            victoryCheck();
+
+            // Find a position to put the "1"
+            boolean test = true;
+            while (test){
+                int randomNumber = rand.nextInt(4);
+                if(fieldMatrix[4][randomNumber] == 0){
+                    fieldMatrix[4][randomNumber] = 1;
+                    test = false;
+                }
+            }
+        } else if (swipeDirection == "left"){
+
+            // Check for victory
+            victoryCheck();
+
+            // Find a position to put the "1"
+            boolean test = true;
+            while (test){
+                int randomNumber = rand.nextInt(4);
+                if(fieldMatrix[randomNumber][4] == 0){
+                    fieldMatrix[randomNumber][4] = 1;
+                    test = false;
+                }
+            }
+        } else if (swipeDirection == "right"){
+
+            // Check for victory
+            victoryCheck();
+
+            // Find a position to put the "1"
+            boolean test = true;
+            while (test){
+                int randomNumber = rand.nextInt(4);
+                if(fieldMatrix[randomNumber][0] == 0){
+                    fieldMatrix[randomNumber][0] = 1;
+                    test = false;
+                }
+            }
+        }
+
+    }
+
+
+    // Checking for Victory
+    public void victoryCheck(){
+
+        if (swipeDirection == "bottom") {
+
+            int testing = 5;
+            for (int j = 0; j <= 4; j++) {
+                if (fieldMatrix[0][j] != 0) {
+                    testing -= 1;
+                }
+            }
+            if (testing == 1) {
+                victory();
+            }
+        } else if (swipeDirection == "top") {
+
+            int testing = 5;
+            for (int j = 0; j <= 4; j++) {
+                if (fieldMatrix[4][j] != 0) {
+                    testing -= 1;
+                }
+            }
+            if (testing == 1) {
+                victory();
+            }
+        } else if (swipeDirection == "left") {
+
+            int testing = 5;
+            for (int j = 0; j <= 4; j++) {
+                if (fieldMatrix[j][4] != 0) {
+                    testing -= 1;
+                }
+            }
+            if (testing == 1) {
+                victory();
+            }
+        } else if (swipeDirection == "right") {
+
+            int testing = 5;
+            for (int j = 0; j <= 4; j++) {
+                if (fieldMatrix[j][0] != 0) {
+                    testing -= 1;
+                }
+            }
+            if (testing == 1) {
+                victory();
+            }
+        }
+
+    }
+
+
+    // Victory
+    public void victory(){
+
+        // Reset the Playing Field
+        for (int i = 0; i <= 4; i++){
+            for (int j = 0; j <= 4; j++){
+                fieldMatrix[i][j] = 0;
+            }
+        }
+
+        // Winning Message
+        Toast.makeText(this,"You won!",Toast.LENGTH_LONG).show();
 
     }
 
@@ -241,6 +413,10 @@ public class MainActivity extends AppCompatActivity {
             field.setBackgroundColor(Color.rgb(255,165,0));
         } else if(value == 1){
             field.setBackgroundColor(Color.rgb(255,0,0));
+        } else if(value == 2){
+            field.setBackgroundColor(Color.rgb(0,255,0));
+        } else if(value == 4){
+            field.setBackgroundColor(Color.rgb(0,0,255));
         }
 
         // notes = (TextView)findViewById(getResources().getIdentifier(VIEW_NAME, "id", getPackageName()))

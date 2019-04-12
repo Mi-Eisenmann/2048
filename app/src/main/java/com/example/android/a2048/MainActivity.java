@@ -6,13 +6,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.view.View.OnTouchListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
@@ -185,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
         else if(swipeDirection == "right"){
             for(int i = 0; i <= 4; i++){
                 for(int k = 0; k < 4; k++){ // Moving everything in the same direction
-                    for (int j = 0; j <= 3; j++) {
+                    for (int j = 3-k; j >= 0; j--) {
 
                         if (fieldMatrix[i][j + 1] == 0) {
                             fieldMatrix[i][j + 1] = fieldMatrix[i][j];
@@ -203,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
         else if(swipeDirection == "left"){
             for(int i = 0; i <= 4; i++){
                 for(int k = 0; k < 4; k++){ // Moving everything in the same direction
-                    for (int j = 4; j > 0; j--) {
+                    for (int j = 1+k; j <= 4; j++) {
 
                         if (fieldMatrix[i][j - 1] == 0) {
                             fieldMatrix[i][j - 1] = fieldMatrix[i][j];
@@ -254,59 +252,56 @@ public class MainActivity extends AppCompatActivity {
 
         Random rand = new Random();
 
-        if (swipeDirection == "bottom"){
+        // Check for Lose
+        LoseCheck();
 
-            // Check for victory
-            victoryCheck();
+        // Which number to spawn
+        int spawnedNumber = numberSpawn();
+
+        if (swipeDirection == "bottom"){
 
             // Find a position to put the "1"
             boolean test = true;
             while (test){
                 int randomNumber = rand.nextInt(4);
                 if(fieldMatrix[0][randomNumber] == 0){
-                    fieldMatrix[0][randomNumber] = 1;
+                    fieldMatrix[0][randomNumber] = spawnedNumber;
                     test = false;
                 }
             }
         } else if (swipeDirection == "top"){
 
-            // Check for victory
-            victoryCheck();
 
             // Find a position to put the "1"
             boolean test = true;
             while (test){
                 int randomNumber = rand.nextInt(4);
                 if(fieldMatrix[4][randomNumber] == 0){
-                    fieldMatrix[4][randomNumber] = 1;
+                    fieldMatrix[4][randomNumber] = spawnedNumber;
                     test = false;
                 }
             }
         } else if (swipeDirection == "left"){
 
-            // Check for victory
-            victoryCheck();
 
             // Find a position to put the "1"
             boolean test = true;
             while (test){
                 int randomNumber = rand.nextInt(4);
                 if(fieldMatrix[randomNumber][4] == 0){
-                    fieldMatrix[randomNumber][4] = 1;
+                    fieldMatrix[randomNumber][4] = spawnedNumber;
                     test = false;
                 }
             }
         } else if (swipeDirection == "right"){
 
-            // Check for victory
-            victoryCheck();
 
             // Find a position to put the "1"
             boolean test = true;
             while (test){
                 int randomNumber = rand.nextInt(4);
                 if(fieldMatrix[randomNumber][0] == 0){
-                    fieldMatrix[randomNumber][0] = 1;
+                    fieldMatrix[randomNumber][0] = spawnedNumber;
                     test = false;
                 }
             }
@@ -315,8 +310,31 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    // Checking for Victory
-    public void victoryCheck(){
+    // Which number to spawn
+    public int numberSpawn(){
+
+        // Getting a random number between 1 and 100 for the propability distribution
+        Random rand = new Random();
+        int randomNumber = rand.nextInt(99)+1;
+
+        // Determine the actual number
+        if (randomNumber <= 60){
+            return 1;
+        } else if (randomNumber <= 85){
+            return 2;
+        } else if (randomNumber <= 96){
+            return 4;
+        } else if (randomNumber <= 98) {
+            return 8;
+        } else {
+            return 16;
+        }
+
+    }
+
+
+    // Checking for a Lose
+    public void LoseCheck(){
 
         if (swipeDirection == "bottom") {
 
@@ -327,7 +345,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             if (testing == 1) {
-                victory();
+                Lose();
             }
         } else if (swipeDirection == "top") {
 
@@ -338,7 +356,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             if (testing == 1) {
-                victory();
+                Lose();
             }
         } else if (swipeDirection == "left") {
 
@@ -349,7 +367,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             if (testing == 1) {
-                victory();
+                Lose();
             }
         } else if (swipeDirection == "right") {
 
@@ -360,15 +378,15 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             if (testing == 1) {
-                victory();
+                Lose();
             }
         }
 
     }
 
 
-    // Victory
-    public void victory(){
+    // Lose
+    public void Lose(){
 
         // Reset the Playing Field
         for (int i = 0; i <= 4; i++){
@@ -377,8 +395,8 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        // Winning Message
-        Toast.makeText(this,"You won!",Toast.LENGTH_LONG).show();
+        // Loosing Message
+        Toast.makeText(this,"You messed up!",Toast.LENGTH_LONG).show();
 
     }
 
@@ -410,13 +428,31 @@ public class MainActivity extends AppCompatActivity {
         field.setText(String.valueOf(value));
 
         if(value == 0){
-            field.setBackgroundColor(Color.rgb(255,165,0));
-        } else if(value == 1){
             field.setBackgroundColor(Color.rgb(255,0,0));
+        } else if(value == 1){
+            field.setBackgroundColor(Color.rgb(255,165,0));
         } else if(value == 2){
-            field.setBackgroundColor(Color.rgb(0,255,0));
+            field.setBackgroundColor(Color.rgb(165,255,0));
         } else if(value == 4){
+            field.setBackgroundColor(Color.rgb(0,255,0));
+        } else if(value == 8){
+            field.setBackgroundColor(Color.rgb(0,255,165));
+        } else if(value == 16){
+            field.setBackgroundColor(Color.rgb(0,165,255));
+        } else if(value == 32){
             field.setBackgroundColor(Color.rgb(0,0,255));
+        } else if(value == 64){
+            field.setBackgroundColor(Color.rgb(100,100,100));
+        } else if(value == 128){
+            field.setBackgroundColor(Color.rgb(200,100,100));
+        } else if(value == 256){
+            field.setBackgroundColor(Color.rgb(100,200,100));
+        } else if(value == 512){
+            field.setBackgroundColor(Color.rgb(100,100,200));
+        } else if(value == 1024){
+            field.setBackgroundColor(Color.rgb(50,50,50));
+        } else if(value == 2048){
+            field.setBackgroundColor(Color.rgb(0,0,0));
         }
 
         // notes = (TextView)findViewById(getResources().getIdentifier(VIEW_NAME, "id", getPackageName()))

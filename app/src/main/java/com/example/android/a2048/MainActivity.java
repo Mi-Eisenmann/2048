@@ -183,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
         else if(swipeDirection == "right"){
             for(int i = 0; i <= 4; i++){
                 for(int k = 0; k < 4; k++){ // Moving everything in the same direction
-                    for (int j = 3-k; j >= 0; j--) {
+                    for (int j = 3/*-k*/; j >= 0; j--) {
 
                         if (fieldMatrix[i][j + 1] == 0) {
                             fieldMatrix[i][j + 1] = fieldMatrix[i][j];
@@ -201,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
         else if(swipeDirection == "left"){
             for(int i = 0; i <= 4; i++){
                 for(int k = 0; k < 4; k++){ // Moving everything in the same direction
-                    for (int j = 1+k; j <= 4; j++) {
+                    for (int j = 1/*+k*/; j <= 4; j++) {
 
                         if (fieldMatrix[i][j - 1] == 0) {
                             fieldMatrix[i][j - 1] = fieldMatrix[i][j];
@@ -244,6 +244,24 @@ public class MainActivity extends AppCompatActivity {
             fieldMatrix[i2][j2] = 2 * value1;
         }
 
+        // Special cases with *2 and /2
+        if (value1 == -1 && value2 == -1 || value1 == -2 && value2 == -2) {
+            fieldMatrix[i1][j1] = value1;
+            fieldMatrix[i2][j2] = value2;
+        } else if (value1 == -1){
+            fieldMatrix[i1][j1] = 0;
+            fieldMatrix[i2][j2] = 2 * value2;
+        } else if (value2 == -1) {
+            fieldMatrix[i1][j1] = 0;
+            fieldMatrix[i2][j2] = 2 * value1;
+        } else if (value1 == -2){
+            fieldMatrix[i1][j1] = 0;
+            fieldMatrix[i2][j2] = value2/2;
+        } else if (value2 == -2){
+            fieldMatrix[i1][j1] = 0;
+            fieldMatrix[i2][j2] = value1/2;
+        }
+
     }
 
 
@@ -253,56 +271,59 @@ public class MainActivity extends AppCompatActivity {
         Random rand = new Random();
 
         // Check for Lose
-        LoseCheck();
+        if (LoseCheck()){
+            Lose();
+        } else {
 
-        // Which number to spawn
-        int spawnedNumber = numberSpawn();
+            // Which number to spawn
+            int spawnedNumber = numberSpawn();
 
-        if (swipeDirection == "bottom"){
+            if (swipeDirection == "bottom") {
 
-            // Find a position to put the "1"
-            boolean test = true;
-            while (test){
-                int randomNumber = rand.nextInt(4);
-                if(fieldMatrix[0][randomNumber] == 0){
-                    fieldMatrix[0][randomNumber] = spawnedNumber;
-                    test = false;
+                // Find a position to put the "1"
+                boolean test = true;
+                while (test) {
+                    int randomNumber = rand.nextInt(4);
+                    if (fieldMatrix[0][randomNumber] == 0) {
+                        fieldMatrix[0][randomNumber] = spawnedNumber;
+                        test = false;
+                    }
                 }
-            }
-        } else if (swipeDirection == "top"){
+            } else if (swipeDirection == "top") {
 
 
-            // Find a position to put the "1"
-            boolean test = true;
-            while (test){
-                int randomNumber = rand.nextInt(4);
-                if(fieldMatrix[4][randomNumber] == 0){
-                    fieldMatrix[4][randomNumber] = spawnedNumber;
-                    test = false;
+                // Find a position to put the "1"
+                boolean test = true;
+                while (test) {
+                    int randomNumber = rand.nextInt(4);
+                    if (fieldMatrix[4][randomNumber] == 0) {
+                        fieldMatrix[4][randomNumber] = spawnedNumber;
+                        test = false;
+                    }
                 }
-            }
-        } else if (swipeDirection == "left"){
+            } else if (swipeDirection == "left") {
 
 
-            // Find a position to put the "1"
-            boolean test = true;
-            while (test){
-                int randomNumber = rand.nextInt(4);
-                if(fieldMatrix[randomNumber][4] == 0){
-                    fieldMatrix[randomNumber][4] = spawnedNumber;
-                    test = false;
+                // Find a position to put the "1"
+                boolean test = true;
+                while (test) {
+                    int randomNumber = rand.nextInt(4);
+                    if (fieldMatrix[randomNumber][4] == 0) {
+                        fieldMatrix[randomNumber][4] = spawnedNumber;
+                        test = false;
+                    }
                 }
-            }
-        } else if (swipeDirection == "right"){
+            } else if (swipeDirection == "right") {
 
 
-            // Find a position to put the "1"
-            boolean test = true;
-            while (test){
-                int randomNumber = rand.nextInt(4);
-                if(fieldMatrix[randomNumber][0] == 0){
-                    fieldMatrix[randomNumber][0] = spawnedNumber;
-                    test = false;
+                // Find a position to put the "1"
+                boolean test = true;
+                while (test) {
+                    int randomNumber = rand.nextInt(4);
+                    if (fieldMatrix[randomNumber][0] == 0) {
+                        fieldMatrix[randomNumber][0] = spawnedNumber;
+                        test = false;
+                    }
                 }
             }
         }
@@ -315,26 +336,30 @@ public class MainActivity extends AppCompatActivity {
 
         // Getting a random number between 1 and 100 for the propability distribution
         Random rand = new Random();
-        int randomNumber = rand.nextInt(99)+1;
+        int randomNumber = rand.nextInt(199)+1;
 
         // Determine the actual number
         if (randomNumber <= 60){
             return 1;
-        } else if (randomNumber <= 85){
+        } else if (randomNumber <= 70){
             return 2;
-        } else if (randomNumber <= 96){
+        } else if (randomNumber <= 90){
             return 4;
-        } else if (randomNumber <= 98) {
+        } else if (randomNumber <= 96){
             return 8;
-        } else {
+        } else if (randomNumber <= 98){
             return 16;
+        } else if (randomNumber <= 99){
+            return -1; // Equivalent to *2
+        } else {
+            return -2; // Equivalent to /2
         }
 
     }
 
 
     // Checking for a Lose
-    public void LoseCheck(){
+    public boolean LoseCheck(){
 
         if (swipeDirection == "bottom") {
 
@@ -345,7 +370,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             if (testing == 1) {
-                Lose();
+                return true;
             }
         } else if (swipeDirection == "top") {
 
@@ -356,7 +381,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             if (testing == 1) {
-                Lose();
+                return true;
             }
         } else if (swipeDirection == "left") {
 
@@ -367,7 +392,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             if (testing == 1) {
-                Lose();
+                return true;
             }
         } else if (swipeDirection == "right") {
 
@@ -378,26 +403,34 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             if (testing == 1) {
-                Lose();
+                return true;
             }
         }
-
+        return false;
     }
 
 
     // Lose
     public void Lose(){
 
-        // Reset the Playing Field
+        Restart();
+
+        // Loosing Message
+        Toast.makeText(this,"You messed up!",Toast.LENGTH_LONG).show();
+
+    }
+
+    public void Restart(){
+        // Delete the Playing Field
         for (int i = 0; i <= 4; i++){
             for (int j = 0; j <= 4; j++){
                 fieldMatrix[i][j] = 0;
             }
         }
-
-        // Loosing Message
-        Toast.makeText(this,"You messed up!",Toast.LENGTH_LONG).show();
-
+        // Re-Add the start values
+        for (int i = 0; i < 5; i++){
+            fieldMatrix[i][i] = 0;
+        }
     }
 
 
@@ -424,8 +457,13 @@ public class MainActivity extends AppCompatActivity {
         //TextView field = findViewById(R.id.field_00);
 
         //Toast.makeText(this, String.valueOf(value),Toast.LENGTH_SHORT).show();
-
-        field.setText(String.valueOf(value));
+        if(value >= 0) {
+            field.setText(String.valueOf(value));
+        } else if(value == -1){
+            field.setText("x2");
+        } else if(value == -2){
+            field.setText("/2");
+        }
 
         if(value == 0){
             field.setBackgroundColor(Color.rgb(255,0,0));
@@ -453,6 +491,10 @@ public class MainActivity extends AppCompatActivity {
             field.setBackgroundColor(Color.rgb(50,50,50));
         } else if(value == 2048){
             field.setBackgroundColor(Color.rgb(0,0,0));
+        } else if(value == -1){
+            field.setBackgroundColor(Color.rgb(33,33,33));
+        } else if(value == -2){
+            field.setBackgroundColor(Color.rgb(200,200,200));
         }
 
         // notes = (TextView)findViewById(getResources().getIdentifier(VIEW_NAME, "id", getPackageName()))

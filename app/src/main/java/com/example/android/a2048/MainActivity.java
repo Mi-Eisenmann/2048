@@ -17,15 +17,18 @@ public class MainActivity extends AppCompatActivity {
 
     public static int[][] fieldMatrix = {
             {1,0,0,0,0},
-            {0,1,0,0,0},
-            {0,0,1,0,0},
-            {0,0,0,1,0},
-            {0,0,0,0,1}
+            {2,0,0,0,0},
+            {2,0,0,0,0},
+            {2,0,0,0,0},
+            {0,0,0,0,0}
     };
 
     public static int touchX;
     public static int touchY;
     public static String swipeDirection;
+
+    public static int currentScore = 0;
+    public static int highScore = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,9 +148,9 @@ public class MainActivity extends AppCompatActivity {
     public void adaptMatrix(){
 
         if(swipeDirection == "bottom"){
-            for(int i = 0; i < 4; i++){
+            for(int j = 0; j <= 4; j++){
                 for(int k = 0; k < 4; k++){ // Moving everything in the same direction
-                    for (int j = 0; j <= 4; j++) {
+                    for (int i = 3; i >= 0; i--) {
 
                         if (fieldMatrix[i + 1][j] == 0) {
                             fieldMatrix[i + 1][j] = fieldMatrix[i][j];
@@ -163,9 +166,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         else if(swipeDirection == "top"){
-            for(int i = 4; i > 0; i--){
+            for(int j = 0; j <= 4; j++){
                 for(int k = 0; k < 4; k++){ // Moving everything in the same direction
-                    for (int j = 0; j <= 4; j++) {
+                    for (int i = 1; i <= 4; i++) {
 
                         if (fieldMatrix[i - 1][j] == 0) {
                             fieldMatrix[i - 1][j] = fieldMatrix[i][j];
@@ -242,6 +245,7 @@ public class MainActivity extends AppCompatActivity {
         if (value1 == value2){
             fieldMatrix[i1][j1] = 0;
             fieldMatrix[i2][j2] = 2 * value1;
+            updateCurrentScore(2*value1);
         }
 
         // Special cases with *2 and /2
@@ -251,15 +255,19 @@ public class MainActivity extends AppCompatActivity {
         } else if (value1 == -1){
             fieldMatrix[i1][j1] = 0;
             fieldMatrix[i2][j2] = 2 * value2;
+            updateCurrentScore(2*value2);
         } else if (value2 == -1) {
             fieldMatrix[i1][j1] = 0;
             fieldMatrix[i2][j2] = 2 * value1;
+            updateCurrentScore(2*value1);
         } else if (value1 == -2){
             fieldMatrix[i1][j1] = 0;
             fieldMatrix[i2][j2] = value2/2;
+            updateCurrentScore(2*value2);
         } else if (value2 == -2){
             fieldMatrix[i1][j1] = 0;
             fieldMatrix[i2][j2] = value1/2;
+            updateCurrentScore(2*value1);
         }
 
     }
@@ -336,7 +344,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Getting a random number between 1 and 100 for the propability distribution
         Random rand = new Random();
-        int randomNumber = rand.nextInt(199)+1;
+        int randomNumber = rand.nextInt(99)+1;
 
         // Determine the actual number
         if (randomNumber <= 60){
@@ -499,6 +507,20 @@ public class MainActivity extends AppCompatActivity {
 
         // notes = (TextView)findViewById(getResources().getIdentifier(VIEW_NAME, "id", getPackageName()))
 
+    }
+
+
+    public void updateCurrentScore(int add){
+        currentScore += add;
+        TextView currentScoreField = findViewById(R.id.currentScoreField);
+        currentScoreField.setText( String.valueOf(currentScore) );
+        updateHighScore();
+    }
+
+    public void updateHighScore(){
+        highScore = currentScore;
+        TextView highScoreField = findViewById(R.id.highScoreField);
+        highScoreField.setText( String.valueOf(highScore) );
     }
 
 

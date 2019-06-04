@@ -43,6 +43,15 @@ public class MainActivity extends AppCompatActivity {
         TextView startView = findViewById(R.id.field_00);
         startView.setBackgroundColor(Color.rgb(255,0,0));
 
+        // Restart Button
+        TextView restartButton = findViewById(R.id.RestartButton);
+        restartButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Restart();
+            }
+        });
+
         String result = String.valueOf(fieldMatrix[0][0]) + " " + String.valueOf(fieldMatrix[0][1]) + " " + String.valueOf(fieldMatrix[0][2]) + " " + String.valueOf(fieldMatrix[0][3]) + " " + String.valueOf(fieldMatrix[0][4]) + "\n"
                 + String.valueOf(fieldMatrix[1][0]) + " " + String.valueOf(fieldMatrix[1][1]) + " " + String.valueOf(fieldMatrix[1][2]) + " " + String.valueOf(fieldMatrix[1][3]) + " " + String.valueOf(fieldMatrix[1][4]) + "\n"
                 + String.valueOf(fieldMatrix[2][0]) + " " + String.valueOf(fieldMatrix[2][1]) + " " + String.valueOf(fieldMatrix[2][2]) + " " + String.valueOf(fieldMatrix[2][3]) + " " + String.valueOf(fieldMatrix[2][4]) + "\n"
@@ -437,8 +446,13 @@ public class MainActivity extends AppCompatActivity {
         }
         // Re-Add the start values
         for (int i = 0; i < 5; i++){
-            fieldMatrix[i][i] = 0;
+            fieldMatrix[i][i] = 1;
         }
+
+        currentScore = 0;
+        updateCurrentScoreDisplay();
+
+        updateField();
     }
 
 
@@ -512,6 +526,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void updateCurrentScore(int add){
         currentScore += add;
+        updateCurrentScoreDisplay();
+    }
+
+    public void updateCurrentScoreDisplay(){
         TextView currentScoreField = findViewById(R.id.currentScoreField);
         currentScoreField.setText( String.valueOf(currentScore) );
         updateHighScore();
@@ -519,6 +537,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void updateHighScore(){
         highScore = currentScore;
+        updateCurrentHighScoreDisplay();
+    }
+
+    public void updateCurrentHighScoreDisplay(){
         TextView highScoreField = findViewById(R.id.highScoreField);
         highScoreField.setText( String.valueOf(highScore) );
     }
